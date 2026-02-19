@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
+import * as Network from "expo-network";
 import {
   View,
   StyleSheet,
@@ -8,6 +9,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import {
   getPopularMovies,
@@ -44,40 +46,54 @@ const Home = () => {
   };
 
   useEffect(() => {
-    getData()
-      .then(
-        ([
+    const loadHomeData = async () => {
+      try {
+        const networkState = await Network.getNetworkStateAsync();
+        const isConnected =
+          networkState.isConnected &&
+          networkState.isInternetReachable !== false;
+
+        if (!isConnected) {
+          setError(true);
+          Alert.alert(
+            "No Connection",
+            "Check your internet connection and try again.",
+          );
+          return;
+        }
+
+        const [
           upcomingMoviesData,
           popularMoviesData,
           popularTvData,
           familyMoviesData,
           documentaryMoviesData,
-        ]) => {
-          const moviesImagesArray = [];
-          const moviesIDArray = [];
+        ] = await getData();
 
-          upcomingMoviesData.forEach((movie) => {
-            moviesImagesArray.push(
-              "https://image.tmdb.org/t/p/w500" + movie.poster_path,
-            );
-            moviesIDArray.push(movie.id);
-          });
+        const moviesImagesArray = [];
+        const moviesIDArray = [];
 
-          setMoviesImages(moviesImagesArray);
-          setMoviesIDs(moviesIDArray);
-          setPopularMovies(popularMoviesData);
-          setPopularTv(popularTvData);
-          setFamilyMovies(familyMoviesData);
-          setDocumentaryMovies(documentaryMoviesData);
-        },
-      )
-      .catch(() => {
-        console.log("Error fetching data");
+        upcomingMoviesData.forEach((movie) => {
+          moviesImagesArray.push(
+            "https://image.tmdb.org/t/p/w500" + movie.poster_path,
+          );
+          moviesIDArray.push(movie.id);
+        });
+
+        setMoviesImages(moviesImagesArray);
+        setMoviesIDs(moviesIDArray);
+        setPopularMovies(popularMoviesData);
+        setPopularTv(popularTvData);
+        setFamilyMovies(familyMoviesData);
+        setDocumentaryMovies(documentaryMoviesData);
+      } catch {
         setError(true);
-      })
-      .finally(() => {
+      } finally {
         setLoaded(true);
-      });
+      }
+    };
+
+    loadHomeData();
   }, []);
 
   return (
@@ -136,7 +152,12 @@ const Home = () => {
       )}
 
       {!loaded && <ActivityIndicator size="large" />}
-      {error && <Error />}
+      {error && (
+        <Error
+          errorText1="Connection error"
+          errorText2="Check your internet connection and try again."
+        />
+      )}
     </>
   );
 };
