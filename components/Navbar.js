@@ -26,10 +26,15 @@ const Navbar = ({ main }) => {
     <SafeAreaView>
       {main ? (
         <View style={styles.mainNav}>
-          <Image
-            style={styles.logo}
-            source={require('../assets/images/movies.png')}
-          />
+          <TouchableOpacity
+            onPress={() => router.replace('/?r=' + Date.now())}
+            activeOpacity={0.7}
+          >
+            <Image
+              style={styles.logo}
+              source={require('../assets/images/movies.png')}
+            />
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => router.push('/search')}>
             <Ionicons name="search-outline" color={Colors.black} size={35} />
           </TouchableOpacity>

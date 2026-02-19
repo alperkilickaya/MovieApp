@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useRouter } from "expo-router";
+import React, { useState, useEffect, useCallback } from "react";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Network from "expo-network";
 import {
   View,
@@ -25,6 +25,7 @@ const dimensions = Dimensions.get("screen");
 
 const Home = () => {
   const router = useRouter();
+  const { r: refreshParam } = useLocalSearchParams();
   const [moviesImages, setMoviesImages] = useState([]);
   const [moviesIDs, setMoviesIDs] = useState([]);
   const [popularMovies, setPopularMovies] = useState([]);
@@ -45,56 +46,58 @@ const Home = () => {
     ]);
   };
 
-  useEffect(() => {
-    const loadHomeData = async () => {
-      try {
-        const networkState = await Network.getNetworkStateAsync();
-        const isConnected =
-          networkState.isConnected &&
-          networkState.isInternetReachable !== false;
+  const loadHomeData = useCallback(async () => {
+    try {
+      setLoaded(false);
+      setError(false);
+      const networkState = await Network.getNetworkStateAsync();
+      const isConnected =
+        networkState.isConnected &&
+        networkState.isInternetReachable !== false;
 
-        if (!isConnected) {
-          setError(true);
-          Alert.alert(
-            "No Connection",
-            "Check your internet connection and try again.",
-          );
-          return;
-        }
-
-        const [
-          upcomingMoviesData,
-          popularMoviesData,
-          popularTvData,
-          familyMoviesData,
-          documentaryMoviesData,
-        ] = await getData();
-
-        const moviesImagesArray = [];
-        const moviesIDArray = [];
-
-        upcomingMoviesData.forEach((movie) => {
-          moviesImagesArray.push(
-            "https://image.tmdb.org/t/p/w500" + movie.poster_path,
-          );
-          moviesIDArray.push(movie.id);
-        });
-
-        setMoviesImages(moviesImagesArray);
-        setMoviesIDs(moviesIDArray);
-        setPopularMovies(popularMoviesData);
-        setPopularTv(popularTvData);
-        setFamilyMovies(familyMoviesData);
-        setDocumentaryMovies(documentaryMoviesData);
-      } catch {
+      if (!isConnected) {
         setError(true);
-      } finally {
-        setLoaded(true);
+        Alert.alert(
+          "No Connection",
+          "Check your internet connection and try again.",
+        );
+        return;
       }
-    };
 
-    loadHomeData();
+      const [
+        upcomingMoviesData,
+        popularMoviesData,
+        popularTvData,
+        familyMoviesData,
+        documentaryMoviesData,
+      ] = await getData();
+
+      const moviesImagesArray = [];
+      const moviesIDArray = [];
+
+      upcomingMoviesData.forEach((movie) => {
+        moviesImagesArray.push(
+          "https://image.tmdb.org/t/p/w500" + movie.poster_path,
+        );
+        moviesIDArray.push(movie.id);
+      });
+
+      setMoviesImages(moviesImagesArray);
+      setMoviesIDs(moviesIDArray);
+      setPopularMovies(popularMoviesData);
+      setPopularTv(popularTvData);
+      setFamilyMovies(familyMoviesData);
+      setDocumentaryMovies(documentaryMoviesData);
+    } catch {
+      setError(true);
+    } finally {
+      setLoaded(true);
+    }
   }, []);
+
+  useEffect(() => {
+    loadHomeData();
+  }, [loadHomeData, refreshParam]);
 
   return (
     <>
