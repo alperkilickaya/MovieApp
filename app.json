@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "MovieApp Expo",
+    "slug": "movieapp-expo",
+    "version": "1.0.0",
+    "scheme": "movieapp-expo",
+    "orientation": "portrait",
+    "platforms": ["android", "ios", "web"],
+    "assetBundlePatterns": ["**/*"],
+    "plugins": ["expo-router"],
+    "android": {
+      "package": "com.moviesappalper"
+    }
+  }
+}
