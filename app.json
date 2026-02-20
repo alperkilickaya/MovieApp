@@ -5,10 +5,20 @@
     "version": "1.0.0",
     "scheme": "movieapp-expo",
     "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
     "platforms": ["android", "ios", "web"],
     "assetBundlePatterns": ["**/*"],
     "plugins": ["expo-router"],
+    "splash": {
+      "image": "./assets/images/movies.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff",
+        "foregroundImage": "./assets/images/adaptive-icon.png"
+      },
       "package": "com.moviesappalper"
     }
   }
