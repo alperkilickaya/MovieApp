@@ -11,6 +11,7 @@ import {
   Image,
   Alert,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   getPopularMovies,
   getUpcomingMovies,
@@ -102,7 +103,12 @@ const Home = () => {
   return (
     <>
       {loaded && !error && (
-        <ScrollView>
+        <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
           {moviesImages?.length > 0 && (
             <ScrollView
               horizontal
@@ -151,7 +157,8 @@ const Home = () => {
               />
             </View>
           )}
-        </ScrollView>
+          </ScrollView>
+        </SafeAreaView>
       )}
 
       {!loaded && <ActivityIndicator size="large" />}
@@ -166,6 +173,15 @@ const Home = () => {
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 24,
+  },
   sliderContainer: {
     flex: 1,
   },

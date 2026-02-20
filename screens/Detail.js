@@ -9,6 +9,7 @@ import {
   Dimensions,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { getMovie } from '../services/services';
 import dateFormat from 'dateformat';
@@ -55,8 +56,12 @@ const Detail = () => {
   return (
     <>
       {loaded && (
-        <View>
-          <ScrollView>
+        <SafeAreaView style={styles.safeArea} edges={['bottom']}>
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
             <Image
               resizeMode="contain"
               style={styles.image}
@@ -91,7 +96,7 @@ const Detail = () => {
               </Text>
             </View>
           </ScrollView>
-        </View>
+        </SafeAreaView>
       )}
       {!loaded && <ActivityIndicator size="large" />}
     </>
@@ -99,6 +104,15 @@ const Detail = () => {
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 24,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',

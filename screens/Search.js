@@ -4,7 +4,7 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
+  ScrollView,
   Text,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -29,8 +29,8 @@ const Search = () => {
   };
 
   return (
-    <SafeAreaView>
-      <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea} edges={['bottom']}>
+      <View style={styles.fixedHeader}>
         <View style={styles.form}>
           <TextInput
             style={styles.input}
@@ -44,33 +44,44 @@ const Search = () => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.searchItems}>
-        {searchResults && searchResults.length > 0 && (
-          <FlatList
-            numColumns={3}
-            data={searchResults}
-            renderItem={({ item }) => <Card item={item} />}
-            keyExtractor={item => String(item.id)}
-          />
-        )}
-        {searchResults && searchResults.length === 0 && (
-          <View>
-            <Text>No results matching your criteria.</Text>
-            <Text>Try different keywords.</Text>
-          </View>
-        )}
-        {!searchResults && (
-          <View>
-            <Text>Type something to start searching.</Text>
-          </View>
-        )}
-        {error && <Error />}
-      </View>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.searchItems}>
+          {searchResults && searchResults.length > 0 && (
+            <View style={styles.resultsGrid}>
+              {searchResults.map(item => (
+                <View key={item.id} style={styles.gridItem}>
+                  <Card item={item} />
+                </View>
+              ))}
+            </View>
+          )}
+          {searchResults && searchResults.length === 0 && (
+            <View style={styles.messageBox}>
+              <Text>No results matching your criteria.</Text>
+              <Text>Try different keywords.</Text>
+            </View>
+          )}
+          {!searchResults && !error && (
+            <View style={styles.messageBox}>
+              <Text>Type something to start searching.</Text>
+            </View>
+          )}
+          {error && <Error />}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   input: {
     borderRadius: 15,
     height: 40,
@@ -78,18 +89,39 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
   },
-  container: {
-    padding: 10,
-    paddingTop: 10,
+  fixedHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
   form: {
     flexBasis: 'auto',
     flexGrow: 1,
   },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 24,
+  },
   searchItems: {
     padding: 5,
+  },
+  resultsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  gridItem: {
+    width: '33.33%',
+    padding: 4,
+  },
+  messageBox: {
+    padding: 16,
   },
 });
 
